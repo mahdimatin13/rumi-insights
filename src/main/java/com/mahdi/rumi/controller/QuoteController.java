@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@CrossOrigin(allowedHeaders = "Content-type")
 @AllArgsConstructor
 @RestController
 @RequestMapping("api/v1/quotes")
@@ -64,6 +65,7 @@ public class QuoteController {
         return mapper.map(dto, Quote.class);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     public List<QuoteDto> getQuotes() {
         var quoteLists = StreamSupport
@@ -73,7 +75,5 @@ public class QuoteController {
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
-
-
     }
 }
