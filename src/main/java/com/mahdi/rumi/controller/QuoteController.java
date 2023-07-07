@@ -3,13 +3,17 @@ package com.mahdi.rumi.controller;
 import com.mahdi.rumi.dto.QuoteDto;
 import com.mahdi.rumi.entity.Quote;
 import com.mahdi.rumi.service.QuoteService;
+import com.mahdi.rumi.user.data.UserDto;
+import com.mahdi.rumi.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,10 +23,11 @@ import java.util.stream.StreamSupport;
 @AllArgsConstructor
 @RestController
 @RequestMapping("api/v1/quotes")
+@PreAuthorize("isAuthenticated()")
 public class QuoteController {
     private final QuoteService service;
     private final ModelMapper mapper;
-
+    private final UserService userService;
 
 
     @GetMapping("/{id}")
@@ -43,6 +48,25 @@ public class QuoteController {
         return convertToDto(quote);
     }
 
+
+
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping
+    public List<QuoteDto> getQuotes(Pageable pageable) {
+        int toSkip = pageable.getPageSize() * pageable.getPageNumber();
+
+        var quoteLists = StreamSupport
+                .stream(service.findAllQuotes().spliterator(), false)
+                .skip(toSkip).limit(pageable.getPageSize())
+                .collect(Collectors.toList());
+
+        return quoteLists
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     @PutMapping("/{id}")
     public void putQuote(
             @PathVariable("id") UUID id,
@@ -57,23 +81,20 @@ public class QuoteController {
         service.updateQuote(id, Quote);
     }
 
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto postUser(@Valid @RequestBody UserDto userDto)
+            throws NoSuchAlgorithmException {
+        return userService.createUser(userDto, userDto.getPassword());
+    }
+
+
+
     private QuoteDto convertToDto(Quote entity) {
         return mapper.map(entity, QuoteDto.class);
     }
 
     private Quote convertToEntity(QuoteDto dto) {
         return mapper.map(dto, Quote.class);
-    }
-
-    @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping
-    public List<QuoteDto> getQuotes() {
-        var quoteLists = StreamSupport
-                .stream(service.findAllQuotes().spliterator(), false)
-                .collect(Collectors.toList());
-        return quoteLists
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
     }
 }

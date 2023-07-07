@@ -3,11 +3,11 @@ package com.mahdi.rumi.entity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.springframework.data.redis.core.RedisHash;
 
 @Data

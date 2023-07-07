@@ -14,12 +14,20 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
+    final AppProperties appProperties;
+
+    public CorsConfig(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
+
+    @Value("${client.url}")
+    private String CLIENT_URL;
 
     @Bean
     CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        corsConfiguration.setAllowedOrigins(Arrays.asList(CLIENT_URL));
         corsConfiguration.setAllowedHeaders(
                 Arrays.asList(
                         "Origin",
@@ -55,5 +63,4 @@ public class CorsConfig {
 
         return new CorsFilter(urlBasedCorsConfigurationSource);
     }
-
 }
