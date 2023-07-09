@@ -6,6 +6,7 @@ import com.mahdi.rumi.service.QuoteService;
 import com.mahdi.rumi.user.data.UserDto;
 import com.mahdi.rumi.user.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+@Slf4j
 @CrossOrigin(allowedHeaders = "Content-type")
 @AllArgsConstructor
 @RestController
@@ -28,6 +33,9 @@ public class QuoteController {
     private final QuoteService service;
     private final ModelMapper mapper;
     private final UserService userService;
+    // LOGGER FROM SLF4j
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuoteController.class);
+    // LOGGER FROM LOMBOK SLF4j
 
 
     @GetMapping("/{id}")
@@ -55,6 +63,13 @@ public class QuoteController {
     @GetMapping
     public List<QuoteDto> getQuotes(Pageable pageable) {
         int toSkip = pageable.getPageSize() * pageable.getPageNumber();
+
+        //SLF4J
+        LOGGER.info("Using SLF4J: Getting quote list - getQuotes() ");
+
+        //LOMBAK SLF4J
+        log.info("Using SLF4J Lombak: Getting quote list - getQuotes() ");
+
 
         var quoteLists = StreamSupport
                 .stream(service.findAllQuotes().spliterator(), false)
